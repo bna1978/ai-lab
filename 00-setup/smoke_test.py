@@ -19,6 +19,15 @@ load_dotenv()
 PROMPT = "In one sentence, what is a token in a large language model?"
 
 
+def cost(prefix, tokens_in, tokens_out):
+    price_in = os.getenv(f"{prefix}_PRICE_IN")
+    price_out = os.getenv(f"{prefix}_PRICE_OUT")
+    if not price_in or not price_out:
+        return f"cost=? (set {prefix}_PRICE_IN and {prefix}_PRICE_OUT in .env)"
+    usd = (tokens_in * float(price_in) + tokens_out * float(price_out)) / 1_000_000
+    return f"${usd:.6f}"
+
+
 def check_anthropic():
     key = os.getenv("ANTHROPIC_API_KEY")
     model = os.getenv("ANTHROPIC_MODEL")
@@ -37,7 +46,9 @@ def check_anthropic():
     text = resp.content[0].text.strip()
     return (
         f"OK | in={resp.usage.input_tokens} out={resp.usage.output_tokens} "
-        f"| {elapsed:.2f}s\n    {text}"
+        f"| {elapsed:.2f}s "
+        f"| {cost('ANTHROPIC', resp.usage.input_tokens, resp.usage.output_tokens)}"
+        f"\n    {text}"
     )
 
 
@@ -59,7 +70,9 @@ def check_openai():
     text = resp.choices[0].message.content.strip()
     return (
         f"OK | in={resp.usage.prompt_tokens} out={resp.usage.completion_tokens} "
-        f"| {elapsed:.2f}s\n    {text}"
+        f"| {elapsed:.2f}s "
+        f"| {cost('OPENAI', resp.usage.prompt_tokens, resp.usage.completion_tokens)}"
+        f"\n    {text}"
     )
 
 
