@@ -1,0 +1,14 @@
+[project]
+name = "ai-lab"
+version = "0.1.0"
+description = "Hands-on AI training: 12 weeks"
+requires-python = ">=3.12"
+dependencies = [
+    "anthropic",
+    "openai",
+    "python-dotenv",
+    "pydantic",
+    "numpy",
+    "pandas",
+    "jupyter",
+]
